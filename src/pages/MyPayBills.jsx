@@ -1,15 +1,18 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import axios from "../api/axiosConfig.js";
+import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import Spinner from "../components/Spinner.jsx";
 import { successToast, errorToast } from "../components/Toast.jsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import UpdateBillModal from "../components/UpdateBillModal.jsx";
 
 const MyPayBills = () => {
   const { user } = useContext(AuthContext);
   const [myBills, setMyBills] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBill, setSelectedBill] = useState(null);
 
   const fetchMyBills = () => {
     setLoading(true);
@@ -20,11 +23,11 @@ const MyPayBills = () => {
   };
 
   useEffect(() => {
-    if(user) fetchMyBills();
+    if (user) fetchMyBills();
   }, [user]);
 
   const handleDelete = (id) => {
-    if(window.confirm("Are you sure to delete this bill?")) {
+    if (window.confirm("Are you sure to delete this bill?")) {
       axios.delete(`/myBills/${id}`)
         .then(() => { successToast("Deleted successfully"); fetchMyBills(); })
         .catch(() => errorToast("Delete failed"));
@@ -37,50 +40,86 @@ const MyPayBills = () => {
     const tableRows = myBills.map(b => [
       b.username, b.email, b.amount, b.address, b.phone, new Date(b.date).toLocaleDateString()
     ]);
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.autoTable({ head: [tableColumn], body: tableRows, startY: 20 });
     doc.text("My Paid Bills Report", 14, 15);
     doc.save("my-bills.pdf");
   };
 
-  if(!user) return <p className="p-6">Login required to view this page</p>;
-  if(loading) return <Spinner />;
+  if (!user) return <p className="p-6 text-center text-red-500 font-semibold">Login required to view this page</p>;
+  if (loading) return <Spinner />;
 
   const totalAmount = myBills.reduce((sum, b) => sum + b.amount, 0);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">My Paid Bills</h1>
-      <button onClick={handleDownload} className="mb-4 px-4 py-2 bg-green-500 text-white rounded">Download PDF</button>
-      <table className="w-full border-collapse border">
-        <thead>
-          <tr>
-            <th className="border p-2">Username</th>
-            <th className="border p-2">Email</th>
-            <th className="border p-2">Amount</th>
-            <th className="border p-2">Address</th>
-            <th className="border p-2">Phone</th>
-            <th className="border p-2">Date</th>
-            <th className="border p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {myBills.map(b => (
-            <tr key={b._id}>
-              <td className="border p-2">{b.username}</td>
-              <td className="border p-2">{b.email}</td>
-              <td className="border p-2">৳{b.amount}</td>
-              <td className="border p-2">{b.address}</td>
-              <td className="border p-2">{b.phone}</td>
-              <td className="border p-2">{new Date(b.date).toLocaleDateString()}</td>
-              <td className="border p-2 space-x-2">
-                <button className="px-2 py-1 bg-yellow-500 text-white rounded">Update</button>
-                <button onClick={()=>handleDelete(b._id)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
-              </td>
+    <div className="p-6 max-w-7xl mx-auto">
+      <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center">My Paid Bills</h1>
+      <div className="flex justify-end mb-6">
+        <button onClick={handleDownload} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+          Download PDF
+        </button>
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block">
+        <table className="w-full border-collapse border">
+          <thead>
+            <tr>
+              <th className="border p-2">Username</th>
+              <th className="border p-2">Email</th>
+              <th className="border p-2">Amount</th>
+              <th className="border p-2">Address</th>
+              <th className="border p-2">Phone</th>
+              <th className="border p-2">Date</th>
+              <th className="border p-2">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="mt-4 font-bold">Total Amount: ৳{totalAmount}</p>
+          </thead>
+          <tbody>
+            {myBills.map(b => (
+              <tr key={b._id} className="hover:bg-gray-100">
+                <td className="border p-2">{b.username}</td>
+                <td className="border p-2">{b.email}</td>
+                <td className="border p-2">৳{b.amount}</td>
+                <td className="border p-2">{b.address}</td>
+                <td className="border p-2">{b.phone}</td>
+                <td className="border p-2">{new Date(b.date).toLocaleDateString()}</td>
+                <td className="border p-2 space-x-2">
+                  <button onClick={() => setSelectedBill(b)} className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">Update</button>
+                  <button onClick={() => handleDelete(b._id)} className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden grid grid-cols-1 gap-4">
+        {myBills.map(b => (
+          <div key={b._id} className="border rounded-lg p-4 shadow hover:shadow-lg transition">
+            <p><span className="font-semibold">Username:</span> {b.username}</p>
+            <p><span className="font-semibold">Email:</span> {b.email}</p>
+            <p><span className="font-semibold">Amount:</span> ৳{b.amount}</p>
+            <p><span className="font-semibold">Address:</span> {b.address}</p>
+            <p><span className="font-semibold">Phone:</span> {b.phone}</p>
+            <p><span className="font-semibold">Date:</span> {new Date(b.date).toLocaleDateString()}</p>
+            <div className="flex justify-between mt-2">
+              <button onClick={() => setSelectedBill(b)} className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">Update</button>
+              <button onClick={() => handleDelete(b._id)} className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-6 font-bold text-right text-lg">Total Amount: ৳{totalAmount}</p>
+
+      {/* Update Modal */}
+      {selectedBill && (
+        <UpdateBillModal
+          bill={selectedBill}
+          onClose={() => setSelectedBill(null)}
+          onUpdated={() => { setSelectedBill(null); fetchMyBills(); }}
+        />
+      )}
     </div>
   );
 };
