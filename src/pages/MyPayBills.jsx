@@ -14,26 +14,36 @@ const MyPayBills = () => {
   const [loading, setLoading] = useState(true);
   const [selectedBill, setSelectedBill] = useState(null);
 
+  // Fetch user's bills
   const fetchMyBills = () => {
+    if (!user?.email) return;
     setLoading(true);
-    axios.get(`/myBills?email=${user.email}`)
+    axios.get(`/myBills/${user.email}`) // ✅ backend route uses :email param
       .then(res => setMyBills(res.data))
-      .catch(err => console.log(err))
+      .catch(err => {
+        console.log(err);
+        errorToast("Failed to fetch bills");
+      })
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    if (user) fetchMyBills();
+    fetchMyBills();
   }, [user]);
 
+  // Delete bill
   const handleDelete = (id) => {
     if (window.confirm("Are you sure to delete this bill?")) {
       axios.delete(`/myBills/${id}`)
-        .then(() => { successToast("Deleted successfully"); fetchMyBills(); })
+        .then(() => {
+          successToast("Deleted successfully");
+          fetchMyBills();
+        })
         .catch(() => errorToast("Delete failed"));
     }
   };
 
+  // Download PDF
   const handleDownload = () => {
     const doc = new jsPDF();
     const tableColumn = ["Username","Email","Amount","Address","Phone","Date"];
@@ -54,7 +64,10 @@ const MyPayBills = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center">My Paid Bills</h1>
       <div className="flex justify-end mb-6">
-        <button onClick={handleDownload} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+        <button 
+          onClick={handleDownload} 
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+        >
           Download PDF
         </button>
       </div>
@@ -83,8 +96,18 @@ const MyPayBills = () => {
                 <td className="border p-2">{b.phone}</td>
                 <td className="border p-2">{new Date(b.date).toLocaleDateString()}</td>
                 <td className="border p-2 space-x-2">
-                  <button onClick={() => setSelectedBill(b)} className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">Update</button>
-                  <button onClick={() => handleDelete(b._id)} className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+                  <button 
+                    onClick={() => setSelectedBill(b)} 
+                    className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                  >
+                    Update
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(b._id)} 
+                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -103,13 +126,24 @@ const MyPayBills = () => {
             <p><span className="font-semibold">Phone:</span> {b.phone}</p>
             <p><span className="font-semibold">Date:</span> {new Date(b.date).toLocaleDateString()}</p>
             <div className="flex justify-between mt-2">
-              <button onClick={() => setSelectedBill(b)} className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">Update</button>
-              <button onClick={() => handleDelete(b._id)} className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+              <button 
+                onClick={() => setSelectedBill(b)} 
+                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+              >
+                Update
+              </button>
+              <button 
+                onClick={() => handleDelete(b._id)} 
+                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+              >
+                Delete
+              </button>
             </div>
           </div>
         ))}
       </div>
 
+      {/* Total Amount */}
       <p className="mt-6 font-bold text-right text-lg">Total Amount: ৳{totalAmount}</p>
 
       {/* Update Modal */}

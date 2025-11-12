@@ -22,7 +22,7 @@ const UpdateBillModal = ({ bill, onClose, onUpdated }) => {
     try {
       await axios.put(`/myBills/${bill._id}`, formData);
       successToast("Bill updated successfully");
-      onUpdated();
+      onUpdated(); // refresh MyPayBills list
     } catch (err) {
       console.log(err);
       errorToast("Update failed");

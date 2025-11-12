@@ -26,6 +26,7 @@ const Navbar = () => {
         <div className="hidden md:flex space-x-6 items-center font-medium">
           <Link to="/" className="hover:text-blue-400 transition">Home</Link>
           <Link to="/bills" className="hover:text-blue-400 transition">Bills</Link>
+          <Link to="/about" className="hover:text-blue-400 transition">About Us</Link>
 
           {user ? (
             <>
@@ -75,6 +76,7 @@ const Navbar = () => {
         <div className="md:hidden bg-gray-800 px-6 py-4 space-y-4 text-center font-medium">
           <Link to="/" onClick={() => setMenuOpen(false)} className="block hover:text-blue-400">Home</Link>
           <Link to="/bills" onClick={() => setMenuOpen(false)} className="block hover:text-blue-400">Bills</Link>
+          <Link to="/about" onClick={() => setMenuOpen(false)} className="block hover:text-blue-400">About Us</Link>
 
           {user ? (
             <>

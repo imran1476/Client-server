@@ -12,11 +12,9 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     if(!/[A-Z]/.test(password) || !/[a-z]/.test(password) || password.length < 6){
       return errorToast("Password must have uppercase, lowercase & at least 6 characters");
     }
-
     try {
       await registerUser(email, password, name);
       successToast("Registration successful");
@@ -27,15 +25,15 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 px-4">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 transform transition hover:scale-105">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Create Account</h2>
 
         <form onSubmit={handleRegister} className="space-y-5">
           <input 
             type="text" 
             placeholder="Full Name" 
-            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
+            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" 
             value={name} 
             onChange={e => setName(e.target.value)} 
             required 
@@ -44,7 +42,7 @@ const Register = () => {
           <input 
             type="email" 
             placeholder="Email" 
-            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
+            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" 
             value={email} 
             onChange={e => setEmail(e.target.value)} 
             required 
@@ -53,7 +51,7 @@ const Register = () => {
           <input 
             type="password" 
             placeholder="Password" 
-            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
+            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" 
             value={password} 
             onChange={e => setPassword(e.target.value)} 
             required 
@@ -61,7 +59,7 @@ const Register = () => {
 
           <button 
             type="submit" 
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition transform hover:-translate-y-1"
+            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition transform hover:-translate-y-1"
           >
             Register
           </button>
@@ -69,7 +67,7 @@ const Register = () => {
 
         <p className="mt-6 text-center text-gray-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 font-semibold hover:underline">
+          <Link to="/login" className="text-indigo-600 font-semibold hover:underline">
             Login
           </Link>
         </p>

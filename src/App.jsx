@@ -1,8 +1,8 @@
-
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import Home from "./pages/Home.jsx";
+import About from "./pages/About.jsx"; // এখানে import যোগ করো
 import Bills from "./pages/Bills.jsx";
 import BillDetails from "./pages/BillDetails.jsx";
 import MyPayBills from "./pages/MyPayBills.jsx";
@@ -17,6 +17,7 @@ function App() {
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />  {/* এই লাইনটি যুক্ত হলো */}
           <Route path="/bills" element={<Bills />} />
           <Route path="/bills/:id" element={<BillDetails />} />
           <Route path="/my-pay-bills" element={<MyPayBills />} />
